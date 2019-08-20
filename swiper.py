@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
 from getpass import getpass
+import urllib as u
 
 
 class Swiper():
@@ -43,7 +44,7 @@ class Swiper():
         time.sleep(5)
 
 
-        """
+        """ Some exceptions that need reviewing - supposedly being ignored by the bypass all command for Chrome
         try:  # Selenium scripts open a testing environment in chrome. Every login acts like a brand new login. Must click through tutorial
             print("Dismissing tutorial prompts")
             self.driver.find_element_by_xpath(
@@ -65,24 +66,58 @@ class Swiper():
             print('Something went wrong during login.')
             return False
         """
+
         print("Ready to start swiping.")
         return True
 
-    def swipe_tinder(self):
+    def dumb_swipe(self):
+
+        """
+        The dumb swiping mode simply swipes right. Could be modified later
+        to store info from profiles in order to educate the model later on
+        """
 
         actions = ActionChains(self.driver)
-        print("Initializing swiping procedure")
+        print("Dumb swiping mode activated")
         time.sleep(5)
         try:
-            # Stop swiping by catching the exception of not finding a profile. closes browser
-            # Missing stuff:
-            # - Stop once it runs out of likes
-            # - Stop if any popup comes up
             while self.driver.find_element_by_class_name("recsCardboard"):
                 actions.send_keys(Keys.ARROW_RIGHT).perform()
                 time.sleep(2)
         except:
-            print("No more profiles found. Quitting.")
+            """
+            Needs extra error handling for no profiles found, popup found,
+            no more likes, free super like screen, etc.
+            """
+            print("Something came up. Quitting...")
             self.driver.quit()
+
+    def manual_swipe(self):
+
+        actions = ActionChains(self.driver)
+        print("Manual swiping mode activated")
+        time.sleep(2)
+
+        try:
+            while True:
+                if self.driver.find_element_by_class_name("react-swipeable-view-container"):
+                    image_links = self.driver.find_elements_by_class_name("recCard")
+                    print('len(image_links): {:}'.format(len(image_links)))
+                    input()
+                    for i in range(len(image_links)):
+                        href = image_links[i].get_attribute('href')
+                        u.urlretrieve(href, "nome da gaja_"+str(i)+".png")
+                    input()
+
+                # get data from current profile, wait for user input (left or right)
+                # when the user clicks, associate this input with data obtained
+                # expect a token when user closes tinder
+                # discard data if user closes tinder before labelling
+                #
+#                href = link.get_attribute('href')
+ #               download = self.browser.get(href)
+        except:
+            return -1
+
 
         return 1

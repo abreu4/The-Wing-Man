@@ -6,7 +6,6 @@ import subprocess
 from swiper import Swiper
 
 
-
 def requests():
     url = 'http://tinder.com'
     r = requests.get(url)  # requests.get to make a get call to google server.
@@ -21,11 +20,18 @@ def requests():
 def main():
 
     swiper = Swiper()
+    mode = "M"
+    # M = manual
+    # S = smart
+    # D = dumb
 
     if swiper.fb_login():
         if swiper.tinder_login:
-            while True:
-                swiper.swipe_tinder()
+            if mode is 'M':
+                swiper.manual_swipe()
+            else:
+                while True:
+                    swiper.dumb_swipe()
 
     else:
         print('Login failed')

@@ -12,3 +12,16 @@
 	- trainingd
 
 	recsCardboard - wraps the pictures and points to pic url
+
+
+Architecture:
+
+The manipulator
+    - Facebook logins
+    - Modes: user should be allowed to change immediately between these
+        - Dumb swiping
+        - Smart swiping
+        - Manual swiping
+        - Diagnosis
+    Bonus:
+        - Function on browsers other than Google Chrome
