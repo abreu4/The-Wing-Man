@@ -1,11 +1,14 @@
+import os
+import re
 import time
+import tkinter
+import urllib
+from getpass import getpass
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-
-from getpass import getpass
-import urllib as u
 
 
 class Swiper():
@@ -16,6 +19,7 @@ class Swiper():
         option.add_argument("--disable-infobars")
         option.add_argument("start-maximized")
         option.add_argument("--disable-extensions")
+
         # Pass the argument 1 to allow and 2 to block
         option.add_experimental_option("prefs", {"profile.default_content_setting_values.notifications": 1})
         self.driver = webdriver.Chrome(chrome_options=option, executable_path='chromedriver.exe')
@@ -29,7 +33,9 @@ class Swiper():
         print("Password entered. Logging in.")
         c = self.driver.find_element_by_id('loginbutton')
         c.click()
-        try:  # Check whether login was successful by finding the home button
+
+        # Check whether login was successful by finding the home button
+        try:
             self.driver.find_element_by_id('u_0_c')
         except:
             return False
@@ -42,7 +48,6 @@ class Swiper():
         print("Clicking on sign in with Facebook.")
         self.driver.find_element_by_xpath("//*[@aria-label='Log in with Facebook']").click()
         time.sleep(5)
-
 
         """ Some exceptions that need reviewing - supposedly being ignored by the bypass all command for Chrome
         try:  # Selenium scripts open a testing environment in chrome. Every login acts like a brand new login. Must click through tutorial
@@ -66,7 +71,6 @@ class Swiper():
             print('Something went wrong during login.')
             return False
         """
-
         print("Ready to start swiping.")
         return True
 
@@ -92,32 +96,53 @@ class Swiper():
             print("Something came up. Quitting...")
             self.driver.quit()
 
-    def manual_swipe(self):
+    def data_extraction(self):
 
-        actions = ActionChains(self.driver)
-        print("Manual swiping mode activated")
-        time.sleep(2)
+        print("Data extraction mode activated")
 
-        try:
-            while True:
-                if self.driver.find_element_by_class_name("react-swipeable-view-container"):
-                    image_links = self.driver.find_elements_by_class_name("recCard")
-                    print('len(image_links): {:}'.format(len(image_links)))
-                    input()
-                    for i in range(len(image_links)):
-                        href = image_links[i].get_attribute('href')
-                        u.urlretrieve(href, "nome da gaja_"+str(i)+".png")
-                    input()
+        # initialize the image counter
+        DIR = './data'
+        counter = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
-                # get data from current profile, wait for user input (left or right)
-                # when the user clicks, associate this input with data obtained
-                # expect a token when user closes tinder
-                # discard data if user closes tinder before labelling
-                #
-#                href = link.get_attribute('href')
- #               download = self.browser.get(href)
-        except:
-            return -1
+        while True:
+            # loops until it finds a profile
+            found_profile = False
+            while not found_profile:
+                try:
+                    found_profile = self.driver.find_elements_by_class_name("react-swipeable-view-container")
+                except NoSuchElementException:
+                    pass
 
+            # find the picture blocks
+            image_blocks = self.driver.find_elements_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@data-swipeable="true"]')
+            print(len(image_blocks))
+
+            # iterates through each of the image blocks
+            for i in range(len(image_blocks)):
+                # loops until it finds a picture link in current block
+                current_picture = None
+                while current_picture is None:
+                    try:
+                        current_picture = self.driver.find_element_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@aria-hidden="false"]//*[@class="Bdrs(8px) Bgz(cv) Bgp(c) StretchedBox"]')
+                    except NoSuchElementException:
+                        pass
+
+                # extracts the picture
+                raw_link = current_picture.get_attribute('style')  # getting the full style block where link is embedded
+                link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # extracting just the url string from said block
+                pathx = urllib.parse.urlparse(link).path  # parsing the filename from the url string
+                extension = os.path.splitext(pathx)[1]  # extracting extension from the filename
+                saved = urllib.request.urlretrieve(link, "./data/"+str(counter)+extension)  # download and save image
+                counter += 1  # increasing the file counter
+
+                print('saved: {:}'.format(saved))
+                #print('link: {:}'.format(link))
+
+                # jumps to the next picture
+                ActionChains(self.driver).send_keys(' ').perform()  # moving toward the next picture
+
+            # jumps to the next profile
+            ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+            time.sleep(0.5)
 
         return 1
