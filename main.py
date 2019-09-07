@@ -42,11 +42,15 @@ def main():
     """
 
     swiper = Swiper()
-    mode = "DE"
+    mode = "DC"
     # DE = data extraction
+    # DC = data conversion
 
     # SS = swipe smart
     # S = swipe dumb
+
+    if mode is "DC":
+        return
 
     if swiper.fb_login():
         if swiper.tinder_login:
