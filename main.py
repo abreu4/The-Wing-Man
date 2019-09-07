@@ -6,18 +6,10 @@ import subprocess
 import tkinter
 
 from swiper import Swiper
+import data
 
-"""
-def requests():
-    url = 'http://tinder.com'
-    r = requests.get(url)  # requests.get to make a get call to google server.
-    with open("tinder.html", "w+") as file:
-        file.write(str(r.content))
-
-    print(r.content)
-    print(r.status_code)
-    print(len(r.content))
-"""
+DATA_TEST = 'data/testing'
+DATA = 'data'
 
 def main():
 
@@ -41,17 +33,18 @@ def main():
     return
     """
 
-    swiper = Swiper()
-    mode = "DC"
+    mode = "DT"
     # DE = data extraction
-    # DC = data conversion
+    # DT = data treatment
 
     # SS = swipe smart
-    # S = swipe dumb
+    # SD = swipe dumb
 
-    if mode is "DC":
+    if mode is "DT":
+        data.rename(DATA)
         return
 
+    swiper = Swiper()
     if swiper.fb_login():
         if swiper.tinder_login:
             if mode is 'DE':
@@ -63,9 +56,9 @@ def main():
 
     else:
         print('Login failed')
+        return -1
 
-
-    return
+    return 1
 
 
 if __name__ == '__main__':
