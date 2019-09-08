@@ -8,10 +8,13 @@
 # 5. rename: given folder, rename all files in order (1,2,...,n)
 # 6. remove_duplicates: md5 hash python for removing duplicates
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 import os
+import cv2
+import shutil
 import subprocess
-from PIL import ImageTk, Image
 import tkinter as tk
+from PIL import ImageTk, Image
 
 from utilities import *
 
@@ -40,7 +43,7 @@ def rename(folder):
 
 def convert(folder):
 
-    """ Converts every picture inside <folder> to JPEG """
+    """ Converts every picture inside folder to JPEG """
 
     assert os.path.isdir(folder), "Invalid data folder"
 
@@ -55,7 +58,7 @@ def convert(folder):
             # deleting duplicate in webp
             os.remove(imgpath)
 
-            print('done converting '+str(filename)+'…')
+            print('Converted '+str(filename))
 
     return 1
 
@@ -81,6 +84,47 @@ def remove_duplicates(folder):
     [os.remove(copycat) for copycat in duplicates]
 
     print('Removed '+str(len(duplicates))+' duplicates')
+    return 1
 
 
+def resize(src_folder, des_folder, width=640, height=800):
+
+    """ Normalizes src folder images into des folder """
+    # Assumes src folder has only image files
+
+    print('\nInitializing resizing subroutine')
+
+    assert os.path.isdir(src_folder), "Invalid data folder"
+    if not os.path.isdir(des_folder):
+        os.mkdir(des_folder)
+        print("New destination directory created")
+
+    image_list = os.listdir(src_folder)
+    assert image_list is not None, "There's nothing to resize in that folder"
+
+    dim = (width, height)
+    print('Goal dimensions {:}'.format(dim))
+    for image in image_list:
+        src_img = os.path.join(src_folder, image)
+
+        if os.path.isfile(src_img):
+
+            des_img = os.path.join(des_folder, image)
+            img_array = cv2.imread(src_img, cv2.IMREAD_UNCHANGED)
+
+            if img_array.shape[0] == dim[1] and img_array.shape[1] == dim[0]:
+                shutil.copy(src_img, des_img)
+
+            else:
+                rs_img = cv2.resize(img_array, dim, interpolation=cv2.INTER_CUBIC)
+                cv2.imwrite(des_img, rs_img)
+                print('Resized image '+image+' {:}'.format(img_array.shape))
+
+        else:
+            continue
+    """
+    cv2.imshow('sample image', img)
+    cv2.waitKey(0)  # waits until a key is pressed
+    cv2.destroyAllWindows()
+    """
     return 1

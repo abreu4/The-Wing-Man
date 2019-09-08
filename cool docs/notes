@@ -7,9 +7,15 @@ https://ai.googleblog.com/2017/12/introducing-nima-neural-image-assessment.html
 https://www.digitalocean.com/community/tutorials/how-to-detect-and-extract-faces-from-an-image-with-opencv-and-python
 https://realpython.com/face-recognition-with-python/
 https://www.youtube.com/watch?v=vC3bTziLRTA
+https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
 
 some useful papers:
 “AVA: A large-scale database for aesthetic visual analysis"
 
 shennanigans:
 https://stackoverflow.com/questions/37796598/how-to-sort-file-names-in-a-particular-order-using-python
+https://www.programiz.com/python-programming/working-csv-files
+http://tetraprogramming.net/converting-webp-image-file-to-standard-jpg-png/
+https://docs.python.org/3/library/shutil.htm
+https://python101.pythonlibrary.org/
+https://github.com/skvark/opencv-python

@@ -135,7 +135,7 @@ class Swiper():
                 saved = urllib.request.urlretrieve(link, "./data/"+str(counter)+extension)  # download and save image
                 counter += 1  # increasing the file counter
 
-                print('saved: {:}'.format(saved))
+                print('Saved: {:}'.format(saved))
                 #print('link: {:}'.format(link))
 
                 # jumps to the next picture

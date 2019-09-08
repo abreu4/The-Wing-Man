@@ -5,10 +5,12 @@ import requests
 import subprocess
 import tkinter
 
+
 from swiper import Swiper
 import data
 
 DATA_TEST = 'data/testing'
+DATA_RESIZE = 'data/testing2'
 DATA = 'data'
 
 def main():
@@ -41,7 +43,7 @@ def main():
     # SD = swipe dumb
 
     if mode is "DT":
-        data.rename(DATA)
+        data.resize(DATA_TEST, DATA_RESIZE)
         return
 
     swiper = Swiper()
