@@ -11,6 +11,7 @@
 
 import os
 import cv2
+import time
 import shutil
 import subprocess
 import tkinter as tk
