@@ -101,8 +101,8 @@ class Swiper():
         print("Data extraction mode activated")
 
         # initialize the image counter
-        DIR = './data'
-        counter = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
+        DIR = './data/raw'
+        counter = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name)) and name.endswith('.jpg')])
 
         while True:
             # loops until it finds a profile

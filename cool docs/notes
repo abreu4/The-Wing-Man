@@ -8,14 +8,27 @@ https://www.digitalocean.com/community/tutorials/how-to-detect-and-extract-faces
 https://realpython.com/face-recognition-with-python/
 https://www.youtube.com/watch?v=vC3bTziLRTA
 https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
+https://av.tib.eu/media/33171 -> Bootstrapping ML project
+https://medium.com/@arijbirnbaum/a-crash-course-in-django-f7a39629e7e0 -> simplest django project to upload photo with description
 
 some useful papers:
 “AVA: A large-scale database for aesthetic visual analysis"
 
+tkinter:
+https://stackoverflow.com/questions/17466561/best-way-to-structure-a-tkinter-application/17470842
+https://pythonspot.com/tk-file-dialogs/
+https://stackoverflow.com/questions/28670461/read-an-image-with-opencv-and-display-it-with-tkinter
+https://www.c-sharpcorner.com/blogs/basics-for-displaying-image-in-tkinter-python
+https://stackoverflow.com/questions/37383755/keyboard-shortcuts-with-tkinter-in-python-3
+https://www.daniweb.com/programming/software-development/code/216830/tkinter-keypress-event-python
+
 shennanigans:
+https://www.rexegg.com/regex-quickstart.html
 https://stackoverflow.com/questions/37796598/how-to-sort-file-names-in-a-particular-order-using-python
 https://www.programiz.com/python-programming/working-csv-files
 http://tetraprogramming.net/converting-webp-image-file-to-standard-jpg-png/
 https://docs.python.org/3/library/shutil.htm
 https://python101.pythonlibrary.org/
 https://github.com/skvark/opencv-python
+https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
+https://www.fyears.org/2017/02/electron-as-gui-of-python-apps-updated.html?fbclid=IwAR1v0hKkzfByK2xuz1UqUbqsfhlv4t18nz6pPL3xYuMlIPAYsQJRqYSngv0

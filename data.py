@@ -27,7 +27,7 @@ def rename(folder):
     assert os.path.isdir(folder), "Invalid data folder"
 
     # get all the files that are not folder in the data folder (images)
-    imagefiles = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
+    imagefiles = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)) and f.endswith('.jpg')]
     imagefiles.sort(key=filenumber)
 
     # rename according to index
@@ -95,10 +95,12 @@ def resize(src_folder, des_folder, width=640, height=800):
 
     print('\nInitializing resizing subroutine')
 
-    assert os.path.isdir(src_folder), "Invalid data folder"
+    assert os.path.isdir(src_folder), "Invalid source data folder"
     if not os.path.isdir(des_folder):
         os.mkdir(des_folder)
         print("New destination directory created")
+    print(os.listdir(des_folder))
+    assert not os.listdir(des_folder), "Destination folder is not empty"
 
     image_list = os.listdir(src_folder)
     assert image_list is not None, "There's nothing to resize in that folder"
@@ -108,7 +110,7 @@ def resize(src_folder, des_folder, width=640, height=800):
     for image in image_list:
         src_img = os.path.join(src_folder, image)
 
-        if os.path.isfile(src_img):
+        if os.path.isfile(src_img) and src_img.endswith('.jpg'):
 
             des_img = os.path.join(des_folder, image)
             img_array = cv2.imread(src_img, cv2.IMREAD_UNCHANGED)

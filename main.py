@@ -3,49 +3,39 @@
 import os
 import requests
 import subprocess
-import tkinter
+import tkinter as tk
 
 
 from swiper import Swiper
+from ranker import Ranker
 import data
 
 DATA_TEST = 'data/testing'
 DATA_RESIZE = 'data/testing2'
-DATA = 'data'
+DATA = 'data/raw'
+
 
 def main():
 
-    """
-    def save_labelled():
-        print('girl + misc = {}'.format(score_girl.get()+score_misc.get()))
-
-    top = tkinter.Tk()
-    top.geometry('300x115')
-
-    score_girl = tkinter.Scale(top, from_=0, to=100, orient='horizontal', length=300)
-    score_girl.grid(column=0, row=0)
-
-    score_misc = tkinter.Scale(top, from_=0, to=100, orient='horizontal', length=300)
-    score_misc.grid(column=0, row=1)
-
-    send_button = tkinter.Button(top, text=("Classify"), command=save_labelled)
-    send_button.grid(column=0, row=2)
-
-    tkinter.mainloop()
-    return
-    """
-
-    mode = "DT"
     # DE = data extraction
     # DT = data treatment
+    # DL = data labelling
 
     # SS = swipe smart
     # SD = swipe dumb
+    mode = "DL"
 
-    if mode is "DT":
-        data.resize(DATA_TEST, DATA_RESIZE)
+    # testing the ranker
+    if mode is "DL":
+        Ranker()
         return
 
+    # testing the data library
+    if mode is "DT":
+        data.rename(DATA_TEST)
+        return
+
+    # testing the swiper library
     swiper = Swiper()
     if swiper.fb_login():
         if swiper.tinder_login:
