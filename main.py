@@ -23,6 +23,7 @@ def main():
 
     # SS = swipe smart
     # SD = swipe dumb
+
     mode = "DL"
 
     # testing the ranker
