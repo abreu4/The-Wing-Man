@@ -15,3 +15,11 @@ def file_hash(filepath):
 
     with open(filepath, 'rb') as f:
         return md5(f.read()).hexdigest()
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

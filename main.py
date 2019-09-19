@@ -7,8 +7,8 @@ import tkinter as tk
 
 
 from swiper import Swiper
-from ranker import Ranker
 import data
+import ranker
 
 DATA_TEST = 'data/testing'
 DATA_RESIZE = 'data/testing2'
@@ -27,7 +27,7 @@ def main():
 
     # testing the ranker
     if mode is "DL":
-        Ranker()
+        ranker.run()
         return
 
     # testing the data library
