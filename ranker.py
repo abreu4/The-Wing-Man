@@ -30,6 +30,7 @@ class Ranker:
         self.image_panel = tk.Label(self.root, text="Welcome to the chick ranker.\nPick a folder and start labelling", image=None)
         self.image_panel.bind("<Key>", self.key_press)
         self.image_panel.grid(row=5, column=0)
+        self.image_panel.grid(row=5, column=0)
 
         self.close_button = tk.Button(self.root, text="Close", command=self.root.quit)
         self.close_button.grid(row=0, column=2)
@@ -81,12 +82,12 @@ class Ranker:
             with open(self.labels_path, mode='r') as labels_file:
                 reader = csv.reader(labels_file, delimiter=',')
                 nrows = sum(1 for row in reader)
-                print('i (pic counter) = {}\nnfiles = {}'.format(nrows, self.image_filenames_length))
+                print('nrows = {}\nnfiles = {}'.format(nrows, self.image_filenames_length))
                 self.i = nrows-1
 
                 # if all the pictures are labelled, no use in continuing
                 # thinner conditions could be added later, such as label quality
-                if self.i == self.image_filenames_length:
+                if self.i >= self.image_filenames_length:
                     self.pictures_left_label.config(text="All pictures are labelled")
                     self.image_panel.config(text="Restart the app")
                     return

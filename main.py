@@ -13,27 +13,32 @@ import ranker
 DATA_TEST = 'data/testing'
 DATA_RESIZE = 'data/testing2'
 DATA = 'data/raw'
+DATA_LABELLING = 'data/labelling'
 
 
 def main():
 
-    # DE = data extraction
-    # DT = data treatment
-    # DL = data labelling
+    # E = extraction
+    # T = treatment
+    # L = labelling
+    # P = predicting
 
     # SS = swipe smart
     # SD = swipe dumb
 
-    mode = "DL"
+    mode = "P"
+
+    if mode is "P":
+        import neural
+        return
 
     # testing the ranker
-    if mode is "DL":
+    if mode is "L":
         ranker.run()
         return
 
-    # testing the data library
-    if mode is "DT":
-        data.rename(DATA_TEST)
+    if mode is "T":
+        data.rename(DATA_LABELLING)
         return
 
     # testing the swiper library
@@ -42,10 +47,18 @@ def main():
         if swiper.tinder_login:
             if mode is 'DE':
                 swiper.data_extraction()
+                return
 
-            else:
-                while True:
-                    swiper.dumb_swipe()
+        elif mode is 'SD':
+            while True:
+                swiper.dumb_swipe()
+                return
+
+        elif mode is 'SS':
+            while True:
+                print("TODO")
+                # swiper.smart_swipe()
+                return
 
     else:
         print('Login failed')

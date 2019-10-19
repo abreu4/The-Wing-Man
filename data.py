@@ -7,6 +7,7 @@
 # 4. label: start labelling routine, ideally from a checkpoint (last labelled image)
 # 5. rename: given folder, rename all files in order (1,2,...,n)
 # 6. remove_duplicates: md5 hash python for removing duplicates
+#
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import os
@@ -49,7 +50,7 @@ def convert(folder):
     assert os.path.isdir(folder), "Invalid data folder"
 
     for filename in os.listdir(folder):
-        if filename.endswith('.webp'):
+        if filename.endswith('.webp') or filename.endswith('.png'):
 
             # creating jpg
             imgpath = os.path.join(folder, filename)
@@ -66,7 +67,7 @@ def convert(folder):
 
 def remove_duplicates(folder):
 
-    """ Removes duplicate file entries inside <folder> """
+    """ Removes duplicate file entries inside folder """
 
     assert os.path.isdir(folder), "Invalid data folder"
     duplicates = []
@@ -91,7 +92,7 @@ def remove_duplicates(folder):
 def resize(src_folder, des_folder, width=640, height=800):
 
     """ Normalizes src folder images into des folder """
-    # Assumes src folder has only image files
+    # Assumes src folder's images of interest have already been converted to '.jpg' format
 
     print('\nInitializing resizing subroutine')
 
@@ -125,9 +126,4 @@ def resize(src_folder, des_folder, width=640, height=800):
 
         else:
             continue
-    """
-    cv2.imshow('sample image', img)
-    cv2.waitKey(0)  # waits until a key is pressed
-    cv2.destroyAllWindows()
-    """
     return 1
