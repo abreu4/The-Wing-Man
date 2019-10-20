@@ -6,9 +6,10 @@ import subprocess
 import tkinter as tk
 
 
-from swiper import Swiper
 import data
 import ranker
+from neural import Libido
+from swiper import Swiper
 
 DATA_TEST = 'data/testing'
 DATA_RESIZE = 'data/testing2'
@@ -29,7 +30,7 @@ def main():
     mode = "P"
 
     if mode is "P":
-        import neural
+        predictor = Libido()
         return
 
     # testing the ranker
