@@ -1,13 +1,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Added NIMA on PyTorch for aesthetic evaluation of pictures
-# Code courtesy of:
-#   - https://github.com/kentsyx/Neural-IMage-Assessment/
-#   - https://github.com/kentsyx/Neural-IMage-Assessment/issues/12
-#
-# Learn more about NIMA in https://arxiv.org/pdf/1709.05424.pdf
-#
+# Ditched the NIMA approach (mood swing?).
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+# Following code is solely kept for educational purposes
+
+"""
 import argparse
 import os
 
@@ -81,3 +79,4 @@ for filename, image in zip(image_names, img_tensors):
     print("________________")
     print("Picture {}: ".format(filename))
     print(u"({}) \u00B1{}".format(round(float(predicted_mean), 2), round(float(predicted_std), 2)))
+"""
