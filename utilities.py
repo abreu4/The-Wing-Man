@@ -1,5 +1,8 @@
 import os
+import string
+import random
 from hashlib import md5
+import msvcrt as micro
 
 
 def filenumber(element):
@@ -23,3 +26,14 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+
+def wait_4_key():
+    return micro.getch()
+
+def random_string(stringLength=25):
+
+    """ Generates a random string of fixed length """
+
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))

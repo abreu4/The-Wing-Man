@@ -8,6 +8,7 @@ import tkinter as tk
 
 import data
 import ranker
+import utilities
 from neural import Libido
 from swiper import Swiper
 
@@ -27,7 +28,7 @@ def main():
     # SS = swipe smart
     # SD = swipe dumb
 
-    mode = "P"
+    mode = "DE"
 
     if mode is "P":
         predictor = Libido()
@@ -47,7 +48,7 @@ def main():
     if swiper.fb_login():
         if swiper.tinder_login:
             if mode is 'DE':
-                swiper.data_extraction()
+                swiper.data_extraction(just_data=True)
                 return
 
         elif mode is 'SD':

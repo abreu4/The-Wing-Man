@@ -1,8 +1,10 @@
 import os
 import re
 import time
-import tkinter
+import shutil
 import urllib
+import tkinter
+from utilities import wait_4_key, random_string
 from getpass import getpass
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -96,17 +98,23 @@ class Swiper():
             print("Something came up. Quitting...")
             self.driver.quit()
 
-    def data_extraction(self):
+    def data_extraction(self, just_data=False):
+
+        """ Extracts and labels pictures from profiles """
+        """ just_data flag swipes left even for right labels """
+        """ in case you, you know, run out of likes """
 
         print("Data extraction mode activated")
 
-        # initialize the image counter
-        DIR = './data/raw'
-        counter = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name)) and name.endswith('.jpg')])
+        DIR = './data/sorted'
+        LEFT = os.path.join(DIR, "left")
+        RIGHT = os.path.join(DIR, "right")
+        # TODO falta um try os is file com makedir na exception
 
         while True:
             # loops until it finds a profile
             found_profile = False
+            done = False
             while not found_profile:
                 try:
                     found_profile = self.driver.find_elements_by_class_name("react-swipeable-view-container")
@@ -115,7 +123,6 @@ class Swiper():
 
             # find the picture blocks
             image_blocks = self.driver.find_elements_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@data-swipeable="true"]')
-            print(len(image_blocks))
 
             # iterates through each of the image blocks
             for i in range(len(image_blocks)):
@@ -130,19 +137,59 @@ class Swiper():
                 # extracts the picture
                 raw_link = current_picture.get_attribute('style')  # getting the full style block where link is embedded
                 link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # extracting just the url string from said block
-                pathx = urllib.parse.urlparse(link).path  # parsing the filename from the url string
-                extension = os.path.splitext(pathx)[1]  # extracting extension from the filename
-                saved = urllib.request.urlretrieve(link, "./data/"+str(counter)+extension)  # download and save image
-                counter += 1  # increasing the file counter
-
-                print('Saved: {:}'.format(saved))
-                #print('link: {:}'.format(link))
+                path = urllib.parse.urlparse(link).path
+                name = random_string()+os.path.splitext(path)[1]
+                saved = urllib.request.urlretrieve(link, os.path.join(DIR, name))  # download and save image
 
                 # jumps to the next picture
                 ActionChains(self.driver).send_keys(' ').perform()  # moving toward the next picture
 
-            # jumps to the next profile
-            ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
-            time.sleep(0.5)
+            # list all the pictures for the current profile
+            imagefiles = [os.path.join(DIR, f) for f in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, f)) and (f.endswith('.jpg') or f.endswith('.webp'))]
+            print("Saved %d pictures." % len(imagefiles))
+
+            # TODO try/except in case user presses invalid key
+
+            while not done:
+
+                swiped = wait_4_key()
+
+                # if you press 1, then pictures for current profile will be saved in 'left' folder
+                if swiped == b'1':
+                    [shutil.move(image, LEFT) for image in imagefiles]
+                    print("Moved to 'left'")
+
+                    # swipes left
+                    ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+                    time.sleep(0.5)
+                    done = True
+
+                # if you press 2, then pictures will go on the 'right'
+                elif swiped == b'2':
+                    [shutil.move(image, RIGHT) for image in imagefiles]
+                    print("Moved to 'right'")
+
+                    # if we're just gathering data, we save right swipes in the 'right' folder, but swipe left instead
+                    if just_data:
+                        # swipes left
+                        ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+                        time.sleep(0.5)
+                    else:
+                        # swipes right
+                        ActionChains(self.driver).send_keys(Keys.ARROW_RIGHT).perform()
+                        time.sleep(0.5)
+
+                    done = True
+
+                else:
+                    for image in imagefiles:
+                            os.remove(image)
+
+                    ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+                    time.sleep(0.5)
+
+                    done = True
+
+
 
         return 1
