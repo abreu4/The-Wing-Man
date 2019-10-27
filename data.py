@@ -19,6 +19,7 @@ import tkinter as tk
 from PIL import ImageTk, Image
 
 from utilities import *
+from detector import DetectorAPI
 
 
 def rename(folder):
@@ -88,6 +89,47 @@ def remove_duplicates(folder):
     print('Removed '+str(len(duplicates))+' duplicates')
     return 1
 
+
+def keep_only_pics_with_people(folder):
+
+    # TODO not really removing anything yet, still under testing
+
+    print("Trimming dataset...")
+
+    model_path = r"C:\Users\Tiago\PycharmProjects\thewingman\support\faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb"
+    odapi = DetectorAPI(path_to_ckpt=model_path)
+    threshold = 0.7
+
+    # List all pictures in folder
+    images = [os.path.join(folder, i) for i in os.listdir(folder)
+              if os.path.isfile(os.path.join(folder, i))
+              and i.endswith(".jpg")
+              or i.endswith(".webp")]
+
+    counter = 0
+    found = False
+    for img in images:
+
+        img = cv2.imread(img)
+        img = cv2.resize(img, (1280, 720))
+        boxes, scores, classes, num = odapi.processFrame(img)
+
+        # Visualization of the results of a detection.
+
+        for i in range(len(boxes)):
+            # Class 1 represents human
+            if classes[i] == 1 and scores[i] > threshold:
+                found=True
+                box = boxes[i]
+                cv2.rectangle(img, (box[1], box[0]), (box[3], box[2]), (255, 0, 0), 2)
+
+        if not found:
+            cv2.imshow("preview", img)
+            cv2.waitKey()
+        else:
+            found = False
+
+    print("Kept %d images" % counter)
 
 def resize(src_folder, des_folder, width=640, height=800):
 

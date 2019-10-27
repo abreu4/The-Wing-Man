@@ -1,4 +1,4 @@
-# the wingman
+# The Wing Man
 
 import os
 import requests
@@ -28,27 +28,35 @@ def main():
     # SS = swipe smart
     # SD = swipe dumb
 
-    mode = "DE"
+    mode = "T"
 
+    # testing 'data.py'
+    if mode is "T":
+        # TODO currently testing dataset treatment with people detector
+        return
+
+    # testing 'neural.py'
     if mode is "P":
         predictor = Libido()
         return
 
-    # testing the ranker
+    """
+    # testing the ranker - DEPRECATED
     if mode is "L":
         ranker.run()
         return
+    """
 
     if mode is "T":
         data.rename(DATA_LABELLING)
         return
 
-    # testing the swiper library
+    # testing the 'swiper.py'
     swiper = Swiper()
     if swiper.fb_login():
         if swiper.tinder_login:
             if mode is 'DE':
-                swiper.data_extraction(just_data=True)
+                swiper.data_extraction()
                 return
 
         elif mode is 'SD':
