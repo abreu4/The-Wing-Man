@@ -4,52 +4,34 @@ import os
 import requests
 import subprocess
 import tkinter as tk
-
-
-import data
 import ranker
 import utilities
-from neural import Libido
 from swiper import Swiper
+from neural import Libido
+from data import convert, split
+
+# TODO: - Test routine to extract only pictures with people
+
 
 DATA_TEST = 'data/testing'
 DATA_RESIZE = 'data/testing2'
 DATA = 'data/raw'
 DATA_LABELLING = 'data/labelling'
+DATA_SORTED = 'data/sorted'
 
 
 def main():
 
-    # E = extraction
-    # T = treatment
-    # L = labelling
-    # P = predicting
-
-    # SS = swipe smart
-    # SD = swipe dumb
-
-    mode = "T"
-
-    # testing 'data.py'
-    if mode is "T":
-        # TODO currently testing dataset treatment with people detector
-        return
-
-    # testing 'neural.py'
-    if mode is "P":
-        predictor = Libido()
-        return
-
     """
-    # testing the ranker - DEPRECATED
-    if mode is "L":
-        ranker.run()
-        return
+    convert(os.path.join(DATA_SORTED, "left"))
+    convert(os.path.join(DATA_SORTED, "right"))
+
+    split(DATA_SORTED, 0.85)
     """
 
-    if mode is "T":
-        data.rename(DATA_LABELLING)
-        return
+    predictor = Libido()
+    predictor.train_model(pretrained=True)
+    exit()
 
     # testing the 'swiper.py'
     swiper = Swiper()

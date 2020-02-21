@@ -13,10 +13,10 @@
 import os
 import cv2
 import time
-import shutil
 import subprocess
 import tkinter as tk
 from PIL import ImageTk, Image
+from shutil import move, copy
 
 from utilities import *
 from detector import DetectorAPI
@@ -159,7 +159,7 @@ def resize(src_folder, des_folder, width=640, height=800):
             img_array = cv2.imread(src_img, cv2.IMREAD_UNCHANGED)
 
             if img_array.shape[0] == dim[1] and img_array.shape[1] == dim[0]:
-                shutil.copy(src_img, des_img)
+                copy(src_img, des_img)
 
             else:
                 rs_img = cv2.resize(img_array, dim, interpolation=cv2.INTER_CUBIC)
@@ -169,3 +169,93 @@ def resize(src_folder, des_folder, width=640, height=800):
         else:
             continue
     return 1
+
+
+def split(datafolder, train_test_ratio):
+    # Quick function summary:
+    # (Assumes root has one folder for each of the classes and nothing else at the moment)
+    #
+    # Make 'test' and 'train' dirs in root
+    # For class_x
+    #	Make folder for class_x inside of each dir
+    # 	List all source image files
+    #	Shuffle said list
+    #	Define proportions accordingly
+    #	In range num_test, pop() to test/class_x
+    #	In range num_train, pop() to train/class_x
+
+    # Class folder names
+    folders = [d for d in os.listdir(datafolder) if not d[0] == '.' and 'pycache' not in d and not os.path.isfile(d) ]
+
+    # Create 'train' and 'test' directories
+    train_path, test_path = __make_train_test_dir(datafolder)
+
+    # Work with one class folder at a time
+    for current_class in folders:
+
+        # DEBUG: Current class
+        print("Class: {}".format(current_class))
+
+        # Create class folder inside every directory
+        class_train_path, class_test_path = __spread_class_folder((train_path, test_path), current_class)
+
+        # List all source image files
+        image_list = os.listdir(os.path.join(datafolder, current_class))
+        random.shuffle(image_list)
+
+        # Extract relative proportions
+        size = len(image_list)
+        train_size = int(size * train_test_ratio)
+        test_size = size - train_size
+
+        print("\t Total: {} \n\t Train: {} \n\t Test: {}".format(size, train_size, test_size))
+
+        # Copy to "train/current_class"
+        for index in range(train_size):
+            image_name = image_list.pop()
+            image_source = __get_image_source_path(datafolder, current_class, image_name)
+            image_destination = os.path.join(class_train_path, image_name)
+            copy(image_source, image_destination)
+
+        # Copy to "test/current_class"
+        for index in range(test_size):
+            image_name = image_list.pop()
+            image_source = __get_image_source_path(datafolder, current_class, image_name)
+            image_destination = os.path.join(class_test_path, image_name)
+            copy(image_source, image_destination)
+
+    return True
+
+def __get_image_source_path(datafolder, class_name, file):
+	return os.path.join(os.path.join(datafolder, class_name), file)
+
+def __get_image_destination_path(train_test_path, folder, file):
+    return os.path.join(os.path.join(train_test_path, folder), file)
+
+def __make_train_test_dir(datafolder):
+    # Returns path relative to datafolder
+
+    paths = [os.path.join(datafolder, x) for x in ['train', 'test']]
+
+    try:
+        [os.mkdir(path) for path in paths]
+        return paths
+    except FileExistsError:
+        print("Train/Test folders exist. Double-check your shit...")
+        exit()
+
+
+def __spread_class_folder(paths, class_name):
+    class_paths = [os.path.join(path, class_name) for path in paths]
+    successful_class_paths = []
+
+    if len(class_paths) > 0:
+        for path in class_paths:
+            try:
+                os.mkdir(path)
+                successful_class_paths.append(path)
+            except FileExistsError:
+                print("Class folder {} exists in {}.".format(class_name, path))
+                exit()
+
+    return successful_class_paths

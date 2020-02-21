@@ -184,6 +184,7 @@ class Swiper():
                 else:
                     for image in imagefiles:
                             os.remove(image)
+                            print("Removed images")
 
                     ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
                     time.sleep(0.5)
