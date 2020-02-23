@@ -89,6 +89,52 @@ def remove_duplicates(folder):
     print('Removed '+str(len(duplicates))+' duplicates')
     return 1
 
+def crop_to_squares(folder):
+    # Crops and OVERWRITES images in 'folder'
+
+    piclist = [picture for picture in os.listdir(folder) if not os.path.isdir(picture)]
+    # print(piclist)
+
+    # TODO: - For this to work, 'piclist' must have assertions for image retrieval rather than any folders and files
+    if len(piclist) < 1:
+        print("\tNo pictures in source directory. Aborting...")
+        return
+
+    for i, image in enumerate(piclist):
+
+        imagepath = os.path.join(folder, image)
+
+        # fig = plt.figure(figsize=(10,10))
+
+        """
+        fig.add_subplot(211)
+        plt.imshow(image)
+        """
+        image = Image.open(imagepath)
+        cropped_image = _crop_to_square(image)
+
+        """
+        fig.add_subplot(212)
+        plt.imshow(image)
+        plt.show()
+        """
+
+        cropped_image.save(imagepath)
+
+def _crop_to_square(image):
+    # Crops an image to square (edge = smallest side) from center
+    # Input/Output is PIL.Image
+
+    width, height = image.size
+
+    edge = min(width, height)
+
+    left = (width - edge) / 2
+    top = (height - edge) / 2
+    right = (width + edge) / 2
+    bottom = (height + edge) / 2
+
+    return image.crop((left, top, right, bottom))
 
 def keep_only_pics_with_people(folder):
 
