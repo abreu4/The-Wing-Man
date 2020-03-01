@@ -11,7 +11,7 @@ from neural import Libido
 from data import convert, split, crop_to_squares
 
 # TODO: - Test routine to extract only pictures with people
-# TODO: - Needs additional crop_to_square routine - add to data.py - in order to train model
+# TODO: - Use imagenet weights as feature extractor, train only last 2 or 3 fully connected layers
 
 
 DATA_TEST = 'data/testing'
@@ -42,7 +42,7 @@ def main():
 
     # TRAINING
     predictor = Libido()
-    predictor.train_model(pretrained=True)
+    predictor.train_model(pretrained=True, feature_extraction=True)
     exit()
 
 

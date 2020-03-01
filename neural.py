@@ -29,11 +29,21 @@ import uuid
 class Libido:
 
     def __init__(self):
+
+        """ Variables """
+
+        # Paths
         self.savepath = "trained_models/"
-        self.current_model_name = str(uuid.uuid1()) + ".pth"
+        self.current_model_path = str(uuid.uuid1()) + ".pth"
         self.data_dir = "data/sorted"
-        self.pretrained = True
-        self.num_epochs = 12
+
+        # Training
+        self.num_epochs = 25
+        self.batch_size = 32
+
+        # Learning rate
+        self.initial_learning_rate = 0.011
+        self.learning_rate_decay = 0.001
 
         # Data augmentation and normalization for training
         # Just normalization for validation
@@ -53,7 +63,7 @@ class Libido:
         }
 
         self.image_datasets = {x: datasets.ImageFolder(os.path.join(self.data_dir, x), self.data_transforms[x]) for x in ['train', 'test']}
-        self.dataloaders = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=4, shuffle=True, num_workers=4) for x in
+        self.dataloaders = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=self.batch_size, shuffle=True, num_workers=4) for x in
                        ['train', 'test']}
         self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'test']}
         self.class_names = self.image_datasets['train'].classes
@@ -62,9 +72,10 @@ class Libido:
         print("Class_names: {}".format(self.class_names))
         print("Using CUDA: {} - {}".format(torch.cuda.is_available(), self.device))
 
-    def train_model(self, pretrained):
+    def train_model(self, pretrained, feature_extraction=False):
 
-        model_ft = models.resnet18(pretrained=self.pretrained)
+        model_ft = models.resnet18(pretrained=pretrained)
+        self.set_parameter_requires_grad(model_ft, feature_extraction=feature_extraction)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
         model_ft = model_ft.to(self.device)
@@ -72,10 +83,10 @@ class Libido:
         criterion = nn.CrossEntropyLoss()
 
         # Observe that all parameters are being optimized - finetuning
-        optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+        optimizer_ft = optim.SGD(model_ft.parameters(), lr=self.initial_learning_rate, momentum=0.9)
 
-        # Decay LR by a factor of 0.001 every epoch
-        exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=1, gamma=0.001)
+        # Decay LR by a factor of 0.001 every <step_size> epochs
+        exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=1, gamma=self.learning_rate_decay)
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -199,3 +210,8 @@ class Libido:
                         model.train(mode=was_training)
                         return
             model.train(mode=was_training)
+
+    def set_parameter_requires_grad(self, model, feature_extraction=False):
+        if feature_extraction:
+            for param in model.parameters():
+                param.requires_grad = False
