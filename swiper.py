@@ -112,6 +112,7 @@ class Swiper():
         # TODO falta um try os is file com makedir na exception
 
         while True:
+
             # loops until it finds a profile
             found_profile = False
             done = False
