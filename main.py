@@ -1,76 +1,53 @@
-# The Wing Man
+# main.py
 
-import os
-import requests
-import subprocess
-import tkinter as tk
-import ranker
-import utilities
-from swiper import Swiper
-from neural import Libido
-from data import convert, split, crop_to_squares
+import argparse
+from pyfiglet import Figlet
 
-# TODO: - Test routine to extract only pictures with people
-# TODO: - Use imagenet weights as feature extractor, train only last 2 or 3 fully connected layers
-
-
-DATA_TEST = 'data/testing'
-DATA_RESIZE = 'data/testing2'
 DATA = 'data/raw'
-DATA_LABELLING = 'data/labelling'
-DATA_SORTED = 'data/sorted'
+DATA_TEST = 'data/test'
+DATA_TRAIN = 'data/train'
+
+parser = argparse.ArgumentParser(description='Train a model to pick the right partners for you.')
+
+parser.add_argument("mode", type=str, choices=["train", "test", "infer", "data"], help="choose between train, infer and data modes")
+parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
+parser.add_argument("--train-data-dir", help="imagenet-style train data directory; defaults to 'data/train'")
+parser.add_argument("--test-data-dir", help="imagenet-style test data directory; defaults to 'data/test'")
+parser.add_argument("--save-data-dir", help="directory in which the two class folders (left and right) will be created; defaults to 'data/raw'")
 
 
-def main():
+args = parser.parse_args()
 
-    mode = "SD"
+if args.verbose:
+	f = Figlet(font='slant')
+	print(f.renderText('The Wing Man'))
 
-    """ DATA TREATMENT 1
-    neural_paths = {x : os.path.join(DATA_SORTED, x) for x in ["train", "test"]}
-    for phase in ["train", "test"]:
-        crop_to_squares(os.path.join(neural_paths[phase], "left"))
-        crop_to_squares(os.path.join(neural_paths[phase], "right"))
-    exit()
-    """
-
-    """ DATA TREATMENT 2
-    convert(os.path.join(DATA_SORTED, "left"))
-    convert(os.path.join(DATA_SORTED, "right"))
-
-    split(DATA_SORTED, 0.85)
-    """
-
-    # TRAINING
-    predictor = Libido()
+if args.mode == "train":
+	print("-> Now entering training mode")
+	predictor = Libido()
     predictor.train_model(pretrained=True, feature_extraction=True)
-    exit()
 
 
-    # testing the 'swiper.py'
-    swiper = Swiper()
+
+if args.mode == "infer" or args.mode == "data"
+
+	# Instantiate swiper object
+	swiper = Swiper()
+
+	# Facebook login
     if swiper.fb_login():
+        
+    	# If valid, Tinder login
         if swiper.tinder_login:
-            if mode is 'DE':
-                swiper.data_extraction()
-                return
+			print("-> Now entering inference mode")
+			print("-> Now entering data extraction mode")
 
-        elif mode is 'SD':
-            while True:
-                swiper.dumb_swipe()
-                return
+		else:
+        print('Tinder login failed')
+        return -1
 
-        elif mode is 'SS':
-            while True:
-                print("TODO")
-                # swiper.smart_swipe()
-                return
-
-    else:
-        print('Login failed')
+	else:
+        print('Facebook login failed')
         return -1
 
     return 1
-
-
-if __name__ == '__main__':
-    main()

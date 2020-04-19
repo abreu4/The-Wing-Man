@@ -1,12 +1,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # A library for image data treatment
 #
-# 1. convert: converts all images to .jpg
-# 2. normalize: normalizes all images to AxA size
-# 3. check: assert data quality: file number, label, dimensions, format
-# 4. label: start labelling routine, ideally from a checkpoint (last labelled image)
-# 5. rename: given folder, rename all files in order (1,2,...,n)
-# 6. remove_duplicates: md5 hash python for removing duplicates
+# » convert: converts all images to .jpg
+# » rename: rename all files in crescent order (1,2,...,n)
+# » remove_duplicates: removes duplicates using md5 hash criteria
+# » keep_only_pics_with_people: *undergoing tests*
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -90,7 +88,8 @@ def remove_duplicates(folder):
     return 1
 
 def crop_to_squares(folder):
-    # Crops and OVERWRITES images in 'folder'
+    
+    """ Crops and OVERWRITES images in 'folder' to central square """
 
     piclist = [picture for picture in os.listdir(folder) if not os.path.isdir(picture)]
     # print(piclist)
@@ -121,24 +120,9 @@ def crop_to_squares(folder):
 
         cropped_image.save(imagepath)
 
-def _crop_to_square(image):
-    # Crops an image to square (edge = smallest side) from center
-    # Input/Output is PIL.Image
-
-    width, height = image.size
-
-    edge = min(width, height)
-
-    left = (width - edge) / 2
-    top = (height - edge) / 2
-    right = (width + edge) / 2
-    bottom = (height + edge) / 2
-
-    return image.crop((left, top, right, bottom))
-
 def keep_only_pics_with_people(folder):
 
-    # TODO not really removing anything yet, still under testing
+    """ TODO not really removing anything yet, still under testing """
 
     print("Trimming dataset...")
 
@@ -179,8 +163,8 @@ def keep_only_pics_with_people(folder):
 
 def resize(src_folder, des_folder, width=640, height=800):
 
-    """ Normalizes src folder images into des folder """
-    # Assumes src folder's images of interest have already been converted to '.jpg' format
+    """ Normalizes src folder images to width*height into des folder """
+    """ Assumes 'src' folder's images are '.jpg' format """
 
     print('\nInitializing resizing subroutine')
 
@@ -218,17 +202,34 @@ def resize(src_folder, des_folder, width=640, height=800):
 
 
 def split(datafolder, train_test_ratio):
-    # Quick function summary:
-    # (Assumes root has one folder for each of the classes and nothing else at the moment)
-    #
-    # Make 'test' and 'train' dirs in root
-    # For class_x
-    #	Make folder for class_x inside of each dir
-    # 	List all source image files
-    #	Shuffle said list
-    #	Define proportions accordingly
-    #	In range num_test, pop() to test/class_x
-    #	In range num_train, pop() to train/class_x
+
+    """
+    Given a folder with subfolders for each class, copies and splits data across a 'test' and 'train' folder according to 'train_test_ratio'
+    
+    » In:
+    datafolder
+        |- class_x
+        |- class_y
+
+    » Out:
+    datafolder
+        |- class_x
+        |- class_y
+        |- train
+        |- test
+
+    » Algorithm:
+    Make 'test' and 'train' dirs in root
+    For class_x
+    	Make folder for class_x inside of each dir
+     	List all source image files
+    	Shuffle said list
+    	Define proportions accordingly
+    	In range num_test, pop() to test/class_x
+    	In range num_train, pop() to train/class_x
+    
+    (Assumes root has one folder for each of the classes and nothing else at the moment)
+    """
 
     # Class folder names
     folders = [d for d in os.listdir(datafolder) if not d[0] == '.' and 'pycache' not in d and not os.path.isfile(d) ]
@@ -272,6 +273,8 @@ def split(datafolder, train_test_ratio):
 
     return True
 
+### Helper functions ###
+
 def __get_image_source_path(datafolder, class_name, file):
 	return os.path.join(os.path.join(datafolder, class_name), file)
 
@@ -290,7 +293,6 @@ def __make_train_test_dir(datafolder):
         print("Train/Test folders exist. Double-check your shit...")
         exit()
 
-
 def __spread_class_folder(paths, class_name):
     class_paths = [os.path.join(path, class_name) for path in paths]
     successful_class_paths = []
@@ -305,3 +307,19 @@ def __spread_class_folder(paths, class_name):
                 exit()
 
     return successful_class_paths
+
+def _crop_to_square(image):
+    
+    """ Crops a single image to square (edge = smallest side) from center """
+    """ Input/Output is PIL.Image """
+
+    width, height = image.size
+
+    edge = min(width, height)
+
+    left = (width - edge) / 2
+    top = (height - edge) / 2
+    right = (width + edge) / 2
+    bottom = (height + edge) / 2
+
+    return image.crop((left, top, right, bottom))
