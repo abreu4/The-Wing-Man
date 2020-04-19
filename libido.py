@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Finetuning torchvision models for the purpose of predicting
-# the swipes, left or right
+# Tinder swipes, left or right
 #
 # Based on https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
 #
@@ -28,18 +28,24 @@ import uuid
 
 class Libido:
 
-    def __init__(self):
+    # TODO: - Change data/sorted to meaningful directory once testing is done
+    def __init__(self, train_data_dir = 'data/sorted', pretrained=True, feature_extraction=True):
+
+        """ Assertions """
+        # TODO
 
         """ Variables """
 
         # Paths
         self.savepath = "trained_models/"
         self.current_model_path = str(uuid.uuid1()) + ".pth"
-        self.data_dir = "data/sorted"
+        self.data_dir = train_data_dir
 
         # Training
         self.num_epochs = 25
         self.batch_size = 32
+        self.pretrained = pretrained
+        self.feature_extraction = feature_extraction
 
         # Learning rate
         self.initial_learning_rate = 0.011
@@ -72,14 +78,16 @@ class Libido:
         print("Class_names: {}".format(self.class_names))
         print("Using CUDA: {} - {}".format(torch.cuda.is_available(), self.device))
 
-    def train_model(self, pretrained, feature_extraction=False):
+    def train_model(self):
 
-        model_ft = models.resnet18(pretrained=pretrained)
-        self.set_parameter_requires_grad(model_ft, feature_extraction=feature_extraction)
+        # Re-shape the model according to our parameters and number of classes
+        model_ft = models.resnet34(pretrained=self.pretrained)
+        self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
         model_ft = model_ft.to(self.device)
 
+        # Define loss criteria
         criterion = nn.CrossEntropyLoss()
 
         # Observe that all parameters are being optimized - finetuning
@@ -215,3 +223,17 @@ class Libido:
         if feature_extraction:
             for param in model.parameters():
                 param.requires_grad = False
+
+    def load_and_show_model_ADHOC(self, model_path):
+
+        model_ft = models.resnet34(pretrained=self.pretrained)
+        self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
+        
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
+        model_ft = model_ft.to(self.device)
+        
+        model_ft.load_state_dict(torch.load(model_path))
+        
+        self.visualize_model(model_ft)
+        plt.show()

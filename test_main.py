@@ -1,4 +1,6 @@
 # The Wing Man
+#
+# Test main, deprecated. Only used as a code fundus.
 
 import os
 import requests
