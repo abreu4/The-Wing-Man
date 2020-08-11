@@ -4,6 +4,7 @@ import argparse
 from pyfiglet import Figlet
 from libido import Libido
 
+CURRENT_PREDICTION_MODEL = 'trained_models/146621b4-822b-11ea-aa24-eacd3e78d411.pth'
 DATA = 'data/raw'
 DATA_TEST = 'data/test'
 DATA_TRAIN = 'data/train'
@@ -36,9 +37,9 @@ def main():
 
 	elif args.mode == "test":
 		tester = Libido(pretrained=True, feature_extraction=True)
-		tester.load_and_show_model_ADHOC('trained_models/146621b4-822b-11ea-aa24-eacd3e78d411.pth')
+		tester.load_and_show_model_ADHOC(CURRENT_PREDICTION_MODEL)
 
-	if args.mode == "infer" or args.mode == "data":
+	elif args.mode == "infer":
 
 		# Instantiate swiper object
 		swiper = Swiper()
@@ -48,14 +49,23 @@ def main():
 
 			# If valid, Tinder login
 			if swiper.tinder_login:
+
 				print("-> Now entering inference mode")
-				print("-> Now entering data extraction mode")
+
+				# Load the model
+				tester = Libido(pretrained=True, feature_extraction=True)
+
+				# Pass model to swiper object's smart_swipe
+
 
 			else:
 				print('Tinder login failed')
 
 		else:
 			print('Facebook login failed')
+
+	elif args.mode == "data":
+		print("-> Now entering data extraction mode")
 
 	exit()
 

@@ -226,6 +226,8 @@ class Libido:
 
     def load_and_show_model_ADHOC(self, model_path):
 
+        # TODO: Assert model_path exists
+        
         model_ft = models.resnet34(pretrained=self.pretrained)
         self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
         

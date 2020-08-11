@@ -98,6 +98,63 @@ class Swiper():
             print("Something came up. Quitting...")
             self.driver.quit()
 
+
+    def smart_swipe(self, just_data=False):
+
+        """ Takes prediction model as input """
+        """ Evaluates pictures in Tinder profile """
+        """ and swipes accordingly """
+
+        self.model = model
+
+        while True:
+
+            # loops until it finds a profile
+            found_profile = False
+            done = False
+            while not found_profile:
+                try:
+                    found_profile = self.driver.find_elements_by_class_name("react-swipeable-view-container")
+                except NoSuchElementException:
+                    pass
+
+            # find the picture blocks
+            image_blocks = self.driver.find_elements_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@data-swipeable="true"]')
+
+            # iterates through each of the image blocks
+            for i in range(len(image_blocks)):
+                # loops until it finds a picture link in current block
+                current_picture = None
+                while current_picture is None:
+                    try:
+                        current_picture = self.driver.find_element_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@aria-hidden="false"]//*[@class="Bdrs(8px) Bgz(cv) Bgp(c) StretchedBox"]')
+                    except NoSuchElementException:
+                        pass
+
+                # extracts the picture
+                raw_link = current_picture.get_attribute('style')  # getting the full style block where link is embedded
+                link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # extracting just the url string from said block
+                #path = urllib.parse.urlparse(link).path
+                #name = random_string()+os.path.splitext(path)[1]
+                #saved = urllib.request.urlretrieve(link, os.path.join(DIR, name))  # download and save image
+
+                # TODO: evaluates picture
+                # TODO: store obtained left and right swipe probabilities
+                # TODO: (optional) delete picture after inference
+
+                # jumps to the next picture
+                ActionChains(self.driver).send_keys(' ').perform()  # moving toward next picture
+
+
+            """ TODO: Useful code, delete later
+            ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+            ActionChains(self.driver).send_keys(Keys.ARROW_RIGHT).perform()
+            time.sleep(0.5)
+            """
+        
+        return 1
+
+
     def data_extraction(self, just_data=False):
 
         """ Extracts and labels pictures from profiles """
