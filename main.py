@@ -4,7 +4,7 @@ import argparse
 from pyfiglet import Figlet
 from libido import Libido
 
-CURRENT_PREDICTION_MODEL = 'trained_models/146621b4-822b-11ea-aa24-eacd3e78d411.pth'
+CURRENT_PREDICTION_MODEL = 'trained_models/5fbd352c-adac-11ea-89e4-cc2f71f824a0.pth'
 DATA = 'data/raw'
 DATA_TEST = 'data/test'
 DATA_TRAIN = 'data/train'

@@ -38,21 +38,21 @@ class Libido:
 
         # Paths
         self.savepath = "trained_models/"
-        self.current_model_path = str(uuid.uuid1()) + ".pth"
+        self.trainable_model_path = str(uuid.uuid1()) + ".pth"
         self.data_dir = train_data_dir
 
-        # Training
+        # Training hyperparameters
         self.num_epochs = 25
         self.batch_size = 32
         self.pretrained = pretrained
         self.feature_extraction = feature_extraction
 
-        # Learning rate
         self.initial_learning_rate = 0.011
         self.learning_rate_decay = 0.001
 
-        # Data augmentation and normalization for training
-        # Just normalization for validation
+        # Dataset transformations
+        # -> Augmentation and normalization for training
+        # -> Normalization for testing
         self.data_transforms = {
             'train': transforms.Compose([
                 transforms.Resize(224),  # RandomResizedCrop(224), - currently assumes input images are square
@@ -68,15 +68,24 @@ class Libido:
             ]),
         }
 
+        # Dataset loader
         self.image_datasets = {x: datasets.ImageFolder(os.path.join(self.data_dir, x), self.data_transforms[x]) for x in ['train', 'test']}
         self.dataloaders = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=self.batch_size, shuffle=True, num_workers=4) for x in
                        ['train', 'test']}
         self.dataset_sizes = {x: len(self.image_datasets[x]) for x in ['train', 'test']}
+        
         self.class_names = self.image_datasets['train'].classes
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         print("Class_names: {}".format(self.class_names))
         print("Using CUDA: {} - {}".format(torch.cuda.is_available(), self.device))
+
+        # Initialize model
+        self.model_ft = models.resnet34(pretrained=self.pretrained)
+        self.set_parameter_requires_grad(self.model_ft, feature_extraction=self.feature_extraction)
+        num_ftrs = self.model_ft.fc.in_features
+        self.model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
+        self.model_ft = self.model_ft.to(self.device)
 
     def train_model(self):
 
@@ -167,7 +176,7 @@ class Libido:
         print('Best val Acc: {:4f}'.format(best_acc))
 
         # Save after training
-        torch.save(best_model_wts, os.path.join(self.savepath, self.current_model_path))
+        torch.save(best_model_wts, os.path.join(self.savepath, self.trainable_model_path))
 
         # Load model
         model.load_state_dict(best_model_wts)
@@ -228,14 +237,7 @@ class Libido:
 
         # TODO: Assert model_path exists
         
-        model_ft = models.resnet34(pretrained=self.pretrained)
-        self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
-        
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
-        model_ft = model_ft.to(self.device)
-        
-        model_ft.load_state_dict(torch.load(model_path))
-        
-        self.visualize_model(model_ft)
+        #self.model_ft.load_state_dict(torch.load(model_path))
+        self.model_ft.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        self.visualize_model(self.model_ft)
         plt.show()
