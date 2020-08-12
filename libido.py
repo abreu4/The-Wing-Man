@@ -89,25 +89,27 @@ class Libido:
 
     def train_model(self):
 
+        """
         # Re-shape the model according to our parameters and number of classes
         model_ft = models.resnet34(pretrained=self.pretrained)
         self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, len(self.class_names))
         model_ft = model_ft.to(self.device)
+        """
 
         # Define loss criteria
         criterion = nn.CrossEntropyLoss()
 
         # Observe that all parameters are being optimized - finetuning
-        optimizer_ft = optim.SGD(model_ft.parameters(), lr=self.initial_learning_rate, momentum=0.9)
+        optimizer_ft = optim.SGD(self.model_ft.parameters(), lr=self.initial_learning_rate, momentum=0.9)
 
         # Decay LR by a factor of 0.001 every <step_size> epochs
         exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=1, gamma=self.learning_rate_decay)
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        model_ft = self._train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=self.num_epochs)
+        self.model_ft = self._train_model(self.model_ft, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=self.num_epochs)
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
