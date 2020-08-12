@@ -1,8 +1,10 @@
 import os
 import string
 import random
+import torch
 from hashlib import md5
-import msvcrt as micro
+from PIL import Image
+#import msvcrt as micro
 
 
 def filenumber(element):
@@ -37,3 +39,15 @@ def random_string(stringLength=25):
 
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
+
+
+def get_image_variable(loader, image_name):
+
+    """ Receives images and transformation and converts it to an inference-ready variable """
+
+    image = Image.open(image_name)
+    image = loader(image).float()
+    image = torch.tensor(image, requires_grad=True)
+    image = image.unsqueeze(0)
+
+    return image

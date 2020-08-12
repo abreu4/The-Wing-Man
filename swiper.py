@@ -4,7 +4,10 @@ import time
 import shutil
 import urllib
 import tkinter
-from utilities import wait_4_key, random_string
+import torch
+# UNCOMMENT
+#from utilities import wait_4_key, random_string
+from utilities import get_image_variable
 from getpass import getpass
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -12,6 +15,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
+TMP_IMAGE_DIR = "./__temp__"
 
 class Swiper():
 
@@ -24,7 +28,7 @@ class Swiper():
 
         # Pass the argument 1 to allow and 2 to block
         option.add_experimental_option("prefs", {"profile.default_content_setting_values.notifications": 1})
-        self.driver = webdriver.Chrome(chrome_options=option, executable_path='chromedriver.exe')
+        #UNCOMMENT self.driver = webdriver.Chrome(chrome_options=option, executable_path='chromedriver.exe')
 
     def fb_login(self):
         self.driver.get('https://www.facebook.com/')
@@ -98,7 +102,7 @@ class Swiper():
             self.driver.quit()
 
 
-    def smart_swipe(self, model, just_data=False):
+    def smart_swipe(self, model, data_transform):
 
         """ Swipes according to your preferences """
         """ Takes prediction model as input """
@@ -106,8 +110,21 @@ class Swiper():
         """ and swipes accordingly """
 
         self.model = model
-        model.eval()
+        self.model.eval()
 
+        with torch.no_grad():
+
+            DEBUG_IMAGE = './data/sorted/test/left/img.jpg' # ugly_1551697624.jpg'
+
+            image_to_predict = get_image_variable(data_transform, DEBUG_IMAGE)
+
+            outputs = self.model(image_to_predict)
+            _ , pred = torch.max(outputs, 1)
+
+            print(f"result: {outputs}")
+
+
+        """
         while True:
 
             # Loop until profile is found
@@ -136,13 +153,21 @@ class Swiper():
                 # Extract picture
                 raw_link = current_picture.get_attribute('style')  # Get the full style block where link is embedded
                 link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # Extract url string from block
-                link_path = urllib.parse.urlparse(link).path
-                name_on_device = random_string()+os.path.splitext(link_path)[1]
-                full_image_path_on_device = os.path.join(DIR, name_on_device)
-                _ = urllib.request.urlretrieve(link, full_image_path_on_device)  # TODO: Find out what this function is returning and add fail safes
+                filename = urllib.parse.urlparse(link).path
+                new_filename = random_string()+os.path.splitext(link_path)[1]
+                full_image_path_on_device = os.path.join(TMP_IMAGE_DIR, new_filename)
+                full_image_path_on_device, _ = urllib.request.urlretrieve(link, full_image_path_on_device)  # TODO: Find out what this function is returning and add fail safes
 
                 # TODO: Evaluate picture
                 # https://stackoverflow.com/questions/50063514/load-a-single-image-in-a-pretrained-pytorch-net
+                transformation = get_image_transform()
+                image_to_predict = get_image_variable(transformation, full_image_path_on_device)
+
+                outputs = self.model(inputs)
+
+                #np.argmax(model_ft(image_loader(data_transforms, $FILENAME)).detach().numpy())
+                #_, preds = torch.max(outputs, 1)
+                
 
                 # TODO: store obtained left and right swipe probabilities (don't max out output)
                 # TODO: delete picture after inference
@@ -151,12 +176,12 @@ class Swiper():
                 ActionChains(self.driver).send_keys(' ').perform()  # moving toward next picture
 
 
-            """ TODO: Useful code, delete later
-            ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
-            ActionChains(self.driver).send_keys(Keys.ARROW_RIGHT).perform()
-            time.sleep(0.5)
-            """
-        
+            # TODO: Useful code, delete later
+            # ActionChains(self.driver).send_keys(Keys.ARROW_LEFT).perform()
+            # ActionChains(self.driver).send_keys(Keys.ARROW_RIGHT).perform()
+            # time.sleep(0.5)
+
+        """
         return 1
 
 
@@ -215,7 +240,8 @@ class Swiper():
 
             while not done:
 
-                swiped = wait_4_key()
+                # UNCOMMENT
+                #swiped = wait_4_key()
 
                 # if you press 1, then pictures for current profile will be saved in 'left' folder
                 if swiped == b'1':

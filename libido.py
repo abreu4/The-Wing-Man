@@ -236,9 +236,14 @@ class Libido:
             for param in model.parameters():
                 param.requires_grad = False
 
-    def load_and_show_model_ADHOC(self, model_path):
+    def show_pretrained_model(self, model_path):
 
-        # TODO: Assert model_path exists
+        self.load_pretrained(model)
+        self.visualize_model(self.model_ft)
+        plt.show()
+
+    def load_pretrained_model(self, model_path):
+
         if not os.path.isfile(model_path):
             print(f"No model at {model_path}. Aborting...")
             return
@@ -247,8 +252,5 @@ class Libido:
             self.model_ft.load_state_dict(torch.load(model_path))
         except RuntimeError: # Happens if loaded model was trained on GPU and only CPU is available
             self.model_ft.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-
-        self.visualize_model(self.model_ft)
-        plt.show()
 
 

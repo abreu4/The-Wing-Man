@@ -3,6 +3,7 @@
 import argparse
 from pyfiglet import Figlet
 from libido import Libido
+from swiper import Swiper
 
 CURRENT_PREDICTION_MODEL = 'trained_models/5fbd352c-adac-11ea-89e4-cc2f71f824a0.pth'
 DATA = 'data/raw'
@@ -37,12 +38,19 @@ def main():
 
 	elif args.mode == "test":
 		tester = Libido(pretrained=True, feature_extraction=True)
-		tester.load_and_show_model_ADHOC(CURRENT_PREDICTION_MODEL)
+		tester.show_pretrained_model(CURRENT_PREDICTION_MODEL)
 
 	elif args.mode == "infer":
 
 		# Instantiate swiper object
 		swiper = Swiper()
+
+		# DEBUG, REMOVE LATER
+		libido = Libido(pretrained=True, feature_extraction=True)
+		libido.load_pretrained_model(CURRENT_PREDICTION_MODEL)
+
+		swiper.smart_swipe(libido.model_ft, libido.data_transforms['test'])
+		exit()
 
 		# Facebook login
 		if swiper.fb_login():
@@ -56,6 +64,8 @@ def main():
 				tester = Libido(pretrained=True, feature_extraction=True)
 
 				# Pass model to swiper object's smart_swipe
+				Swipe.smart_swipe(tester.model_ft, tester.data_transforms['test'])
+
 
 
 			else:
