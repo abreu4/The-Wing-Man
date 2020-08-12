@@ -77,8 +77,8 @@ class Libido:
         self.class_names = self.image_datasets['train'].classes
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        print("Class_names: {}".format(self.class_names))
-        print("Using CUDA: {} - {}".format(torch.cuda.is_available(), self.device))
+        #print("Class_names -> {}".format(self.class_names))
+        print("Using CUDA? {} - {}".format(torch.cuda.is_available(), self.device))
 
         # Initialize model
         self.model_ft = models.resnet34(pretrained=self.pretrained)
@@ -184,15 +184,16 @@ class Libido:
         model.load_state_dict(best_model_wts)
 
         # Visualize best model
-        # TODO: - For debug, remove once done
         self.visualize_model(model)
         plt.show()
 
-        # return model
+        # Return model
         return model
 
     def imshow(self, inp, title=None):
-        """Imshow for Tensor."""
+
+        """Imshow for Tensor"""
+        
         inp = inp.numpy().transpose((1, 2, 0))
         mean = np.array([0.485, 0.456, 0.406])
         std = np.array([0.229, 0.224, 0.225])
@@ -238,8 +239,16 @@ class Libido:
     def load_and_show_model_ADHOC(self, model_path):
 
         # TODO: Assert model_path exists
+        if not os.path.isfile(model_path):
+            print(f"No model at {model_path}. Aborting...")
+            return
         
-        #self.model_ft.load_state_dict(torch.load(model_path))
-        self.model_ft.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        try:
+            self.model_ft.load_state_dict(torch.load(model_path))
+        except RuntimeError: # Happens if loaded model was trained on GPU and only CPU is available
+            self.model_ft.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+
         self.visualize_model(self.model_ft)
         plt.show()
+
+

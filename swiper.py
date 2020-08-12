@@ -79,8 +79,7 @@ class Swiper():
     def dumb_swipe(self):
 
         """
-        The dumb swiping mode simply swipes right. Could be modified later
-        to store info from profiles in order to educate the model later on
+        Swipes right every time
         """
 
         actions = ActionChains(self.driver)
@@ -99,17 +98,19 @@ class Swiper():
             self.driver.quit()
 
 
-    def smart_swipe(self, just_data=False):
+    def smart_swipe(self, model, just_data=False):
 
+        """ Swipes according to your preferences """
         """ Takes prediction model as input """
         """ Evaluates pictures in Tinder profile """
         """ and swipes accordingly """
 
         self.model = model
+        model.eval()
 
         while True:
 
-            # loops until it finds a profile
+            # Loop until profile is found
             found_profile = False
             done = False
             while not found_profile:
@@ -118,12 +119,13 @@ class Swiper():
                 except NoSuchElementException:
                     pass
 
-            # find the picture blocks
+            # Find the picture block
             image_blocks = self.driver.find_elements_by_xpath('//*[@class="recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active"]//*[@class="react-swipeable-view-container"]//*[@data-swipeable="true"]')
 
-            # iterates through each of the image blocks
+            # Iterates through each of the image blocks
             for i in range(len(image_blocks)):
-                # loops until it finds a picture link in current block
+
+                # Loops until picture link is found
                 current_picture = None
                 while current_picture is None:
                     try:
@@ -131,18 +133,21 @@ class Swiper():
                     except NoSuchElementException:
                         pass
 
-                # extracts the picture
-                raw_link = current_picture.get_attribute('style')  # getting the full style block where link is embedded
-                link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # extracting just the url string from said block
-                #path = urllib.parse.urlparse(link).path
-                #name = random_string()+os.path.splitext(path)[1]
-                #saved = urllib.request.urlretrieve(link, os.path.join(DIR, name))  # download and save image
+                # Extract picture
+                raw_link = current_picture.get_attribute('style')  # Get the full style block where link is embedded
+                link = re.search("(?P<url>https?://[^\s'\"]+)", raw_link).group("url")  # Extract url string from block
+                link_path = urllib.parse.urlparse(link).path
+                name_on_device = random_string()+os.path.splitext(link_path)[1]
+                full_image_path_on_device = os.path.join(DIR, name_on_device)
+                _ = urllib.request.urlretrieve(link, full_image_path_on_device)  # TODO: Find out what this function is returning and add fail safes
 
-                # TODO: evaluates picture
-                # TODO: store obtained left and right swipe probabilities
-                # TODO: (optional) delete picture after inference
+                # TODO: Evaluate picture
+                # https://stackoverflow.com/questions/50063514/load-a-single-image-in-a-pretrained-pytorch-net
 
-                # jumps to the next picture
+                # TODO: store obtained left and right swipe probabilities (don't max out output)
+                # TODO: delete picture after inference
+
+                # Jump to the next picture
                 ActionChains(self.driver).send_keys(' ').perform()  # moving toward next picture
 
 
