@@ -53,6 +53,7 @@ class Libido:
         # Dataset transformations
         # -> Augmentation and normalization for training
         # -> Normalization for testing
+        
         self.data_transforms = {
             'train': transforms.Compose([
                 transforms.Resize(224),  # RandomResizedCrop(224), - currently assumes input images are square
@@ -91,6 +92,7 @@ class Libido:
 
         """
         # Re-shape the model according to our parameters and number of classes
+        
         model_ft = models.resnet34(pretrained=self.pretrained)
         self.set_parameter_requires_grad(model_ft, feature_extraction=self.feature_extraction)
         num_ftrs = model_ft.fc.in_features
@@ -238,11 +240,11 @@ class Libido:
 
     def show_pretrained_model(self, model_path):
 
-        self.load_pretrained(model)
+        self.load_pretrained(model_path)
         self.visualize_model(self.model_ft)
         plt.show()
 
-    def load_pretrained_model(self, model_path):
+    def load_pretrained(self, model_path):
 
         if not os.path.isfile(model_path):
             print(f"No model at {model_path}. Aborting...")

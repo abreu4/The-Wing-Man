@@ -41,7 +41,7 @@ def random_string(stringLength=25):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-def get_image_variable(loader, image_name):
+def get_pillow_image(loader, image_name):
 
     """ Receives images and transformation and converts it to an inference-ready variable """
 
