@@ -1,15 +1,28 @@
 # The Wing Man
 
-The Wing Man is a(n aspiring) command line tool which knows "your type". It runs on top of Tinder web.
-It includes train and infer logic, meaning once you tell it which type of looks you find attractive, it swipes possible partners accordingly and automatically.
+The Wing Man is a automatic tinder CLI which knows "your type". It runs on top of Tinder web.
+It includes training, testing and inference logic (under development), meaning once you train the model to know which type of looks you find attractive, it swipes possible partners accordingly and automatically.
 
 ## Installation
 
-TBA
+All required packages are installed through anaconda
+
+``conda env create -f environment.yml``
+``conda activate thewingman``
+
+Make sure you have the adequate chromedriver for your OS
 
 ## Usage
 
-TBA
+``python main.py {train, test, infer, data}``
+
+- data: create your own dataset from tinder profiles
+- train: train a model on your dataset, saves model to trained_models/
+- test: preview model of your choice on test dataset
+- infer: automatically evaluate all pictures from a profile and swipe left or right accordingly
+
+See ``python main.py -h``for more info
 
 ## Contributing
-Absolutely.
+
+Forks and PRs welcome
